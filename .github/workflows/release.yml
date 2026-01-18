@@ -43,6 +43,8 @@ jobs:
         log="${log//$'\r'/'%0D'}"                             # Multiline escape sequences for '\r'
         echo "::debug::Changelog: ${log}"
         echo "log=$log" >> "$GITHUB_OUTPUT"
+      env:
+        GH_TOKEN: ${{ github.token }}
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
