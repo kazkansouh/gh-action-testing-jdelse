@@ -1,0 +1,40 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+      - dccboxed-*
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - dccboxed-*
+
+jobs:
+
+  release:
+    name: Upload Release Package
+    if: github.event_name == 'push' && github.ref_type == 'tag' && startsWith(github.ref_name, 'v')
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - name: Extract and check package version
+      id: get-package
+      run: |
+        package="data.txt"
+        if test -f "${package}"; then
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+        else
+          echo "Error: expected package file at: ${package}" 1>&2
+          exit 1
+        fi
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ${{ steps.get-package.outputs.package }}
+        tag: ${{ github.ref }}
+        overwrite: true
+        body: "Release ${{ github.ref_name }}"
