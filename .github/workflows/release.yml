@@ -32,6 +32,17 @@ jobs:
           echo "Error: expected package file at: ${package}" 1>&2
           exit 1
         fi
+    - name: Extract change log
+      id: get-log
+      run: |
+        previousRelease=$(gh release view --json tagName --jq .tagName)
+        echo "::debug::Previous release: ${previousRelease}"
+        log=$(git log --pretty=format:%s --invert-grep  --grep ^build  ${previousRelease}..HEAD)
+        log="${log//'%'/'%25'}"                               # Multiline escape sequences for %
+        log="${log//$'\n'/'%0A'}"                             # Multiline escape sequences for '\n'
+        log="${log//$'\r'/'%0D'}"                             # Multiline escape sequences for '\r'
+        echo "::debug::Changelog: ${log}"
+        echo "log=$log" >> "$GITHUB_OUTPUT"
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
@@ -39,4 +50,6 @@ jobs:
         file: ${{ steps.get-package.outputs.package }}
         tag: ${{ github.ref }}
         overwrite: true
-        body: "Release ${{ github.ref_name }}"
+        body: |
+          Changelog
+          ${{ steps.get-log.outputs.log }}
