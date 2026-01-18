@@ -36,12 +36,12 @@ jobs:
       id: get-log
       run: |
         previousRelease=$(gh release view --json tagName --jq .tagName)
-        echo "::debug::Previous release: ${previousRelease}"
-        log=$(git log --pretty=format:%s --invert-grep  --grep ^build  ${previousRelease}..HEAD)
+        echo "Previous release: ${previousRelease}"
+        log=$(git log --pretty=format:%s --invert-grep  --grep ^build  ${previousRelease}..${{ github.sha }})
         log="${log//'%'/'%25'}"                               # Multiline escape sequences for %
         log="${log//$'\n'/'%0A'}"                             # Multiline escape sequences for '\n'
         log="${log//$'\r'/'%0D'}"                             # Multiline escape sequences for '\r'
-        echo "::debug::Changelog: ${log}"
+        echo "Changelog: ${log}"
         echo "log=$log" >> "$GITHUB_OUTPUT"
       env:
         GH_TOKEN: ${{ github.token }}
