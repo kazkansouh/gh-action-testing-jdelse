@@ -38,6 +38,7 @@ jobs:
         set -x
         previousRelease=$(gh release view --json tagName --jq .tagName)
         echo "Previous release: ${previousRelease}"
+        git tag
         log=$(git log '--pretty=format:%s' --invert-grep  --grep ^build  ${previousRelease}..${{ github.sha }})
         log="${log//'%'/'%25'}"                               # Multiline escape sequences for %
         log="${log//$'\n'/'%0A'}"                             # Multiline escape sequences for '\n'
