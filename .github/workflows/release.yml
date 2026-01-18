@@ -35,6 +35,7 @@ jobs:
     - name: Extract change log
       id: get-log
       run: |
+        set -x
         previousRelease=$(gh release view --json tagName --jq .tagName)
         echo "Previous release: ${previousRelease}"
         log=$(git log --pretty=format:%25s --invert-grep  --grep ^build  ${previousRelease}..${{ github.sha }})
