@@ -58,5 +58,6 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
         body: |
-          Changelog
+          **Changelog**
+          
           ${{ steps.get-log.outputs.log }}
